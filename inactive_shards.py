@@ -24,10 +24,10 @@ def table(title, l):
             item["shard"],
             item["prirep"],
             item["unassigned.reason"] or "",
-            item["docs"],
-            item["store"],
-            item["ip"],
-            item["node"]
+            item["docs"] or '0',
+            item["store"] or '0',
+            item["ip"] or "",
+            item["node"] or ""
         ]) + "</td></tr>"
     return temp + "</table><br/>"
 
