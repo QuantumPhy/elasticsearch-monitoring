@@ -42,6 +42,7 @@ with open("clusters.json") as f:
                     "body": "<br />".join(config["eshosts"].split(","))
                 }
             )
+            mail(cluster, result)
             continue
 
         result.append(health(cluster, connection))
