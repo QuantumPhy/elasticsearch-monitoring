@@ -4,6 +4,7 @@ from health import health
 from master import get_master
 from mailer import mail
 from inactive_shards import inactive_shards
+from indices import indices
 
 LOG_FILENAME = "es_monitor.log"
 
@@ -44,6 +45,7 @@ with open("clusters.json") as f:
             continue
 
         result.append(health(cluster, connection))
+        result.append(indices(cluster, connection))
         result.append(inactive_shards(cluster, connection))
         # from pprint import pprint
         # pprint(result)
