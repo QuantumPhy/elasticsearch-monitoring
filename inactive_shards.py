@@ -50,6 +50,7 @@ def inactive_shards(cluster, connection):
         }
     else:
         shards_data = json.loads(response)
+        started = [shard for shard in shards_data if shard["state"] == "STARTED"]
         init = [shard for shard in shards_data if shard["state"] == "INITIALIZING"]
         relocating = [shard for shard in shards_data if shard["state"] == "RELOCATING"]
         unassigned = [shard for shard in shards_data if shard["state"] == "UNASSIGNED"]
@@ -58,11 +59,13 @@ def inactive_shards(cluster, connection):
 
         result["body"] += """<table width='100%' border=1 cellpadding=3 cellspacing=0>
             <tr><td>Total</td><td>{0}</td></tr>
-            <tr><td>Initializing</td><td>{1}</td></tr>
-            <tr><td>Relocating</td><td>{2}</td></tr>
-            <tr><td>Unassigned</td><td>{3}</td></tr>
+            <tr><td>Started</td><td>{1}</td></tr>
+            <tr><td>Initializing</td><td>{2}</td></tr>
+            <tr><td>Relocating</td><td>{3}</td></tr>
+            <tr><td>Unassigned</td><td>{4}</td></tr>
         </table><br />""".format(
             len(shards_data),
+            len(started),
             len(init),
             len(relocating),
             len(unassigned)
