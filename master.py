@@ -23,7 +23,11 @@ def get_master(cluster, config):
 def Try(hostname, config):
     try:
         if config.get("secure", False):
-            conn = httplib.HTTPSConnection(hostname, context=ssl._create_unverified_context())
+            import sys
+            if sys.version_info >= (2, 7, 9):
+                conn = httplib.HTTPSConnection(hostname, context=ssl._create_unverified_context())
+            else:
+                conn = httplib.HTTPSConnection(hostname)
             from base64 import b64encode
             credentials = b64encode(
                 b"{0}:{1}".format(config.get("username", ""), config.get("password", ""))
