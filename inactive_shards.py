@@ -54,7 +54,12 @@ def inactive_shards(cluster, connection):
         init = [shard for shard in shards_data if shard["state"] == "INITIALIZING"]
         relocating = [shard for shard in shards_data if shard["state"] == "RELOCATING"]
         unassigned = [shard for shard in shards_data if shard["state"] == "UNASSIGNED"]
-        if unassigned or init or any(s["prirep"] == "p" for s in relocating):
+
+        if init or any(s["prirep"] == "p" for s in relocating):
+            result["severity"] = "FATAL"
+        elif unassigned and all(u["unassigned.reason"] == "INDEX_CREATED" for u in unassigned):
+            result["severity"] = "WARNING"
+        elif unassigned:
             result["severity"] = "FATAL"
 
         result["body"] += """<table width='100%' border=1 cellpadding=3 cellspacing=0>
