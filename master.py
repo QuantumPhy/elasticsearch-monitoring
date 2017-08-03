@@ -42,3 +42,6 @@ def Try(hostname, config):
     except error as e:
         logger.warn("Host %s throws %s", hostname, e)
         return [(False, None, None)]
+    except Exception as e:
+        logger.warn("Unexpected Exception %s with %s", e, hostname)
+        return [(False, None, None)]
