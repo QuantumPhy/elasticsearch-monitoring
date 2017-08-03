@@ -9,7 +9,7 @@ except ImportError:
 
 
 def sort(item):
-    return (item["index"], int(item["shard"]), item["prirep"], item["node"])
+    return item["index"], int(item["shard"]), item["prirep"], item["node"]
 
 
 def table(title, l):
@@ -32,7 +32,7 @@ def table(title, l):
     return temp + "</table><br/>"
 
 
-def inactive_shards(cluster, connection):
+def inactive_shards(connection):
     r1 = connection("/_cat/shards?h=index,shard,prirep,state,unassigned.reason,docs,store,ip,node")
     response = r1.read()
     result = {
@@ -80,4 +80,5 @@ def inactive_shards(cluster, connection):
             result["body"] += table("Initializing", init)
         if relocating:
             result["body"] += table("Relocating", init)
+
     return result

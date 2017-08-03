@@ -11,12 +11,12 @@ def get_master(cluster, config):
     hosts = config["eshosts"].split(",")
     if cluster not in CHOSEN_MASTERS:
         master, conn = next(
-            ((h, c) for host in hosts for r, h, c in Try(host, config) if r), (None, None)
+            ((h, c) for host in hosts for r, h, c in get_conn(host, config) if r), (None, None)
         )
         if master and conn:
             CHOSEN_MASTERS[cluster] = {"host": master, "connection": conn}
         else:
-            raise Exception("No valid master found for cluster {0}".format(cluster))
+            raise StandardError("No valid master found for cluster {0}".format(cluster))
     return CHOSEN_MASTERS[cluster]
 
 
@@ -27,7 +27,7 @@ def request(connection, headers):
     return get
 
 
-def Try(hostname, config):
+def get_conn(hostname, config):
     try:
         headers = {'Content-Type': 'application/json'}
         if config.get("secure", False):

@@ -1,11 +1,11 @@
-import logging
 import logging.handlers
+
+from allocations import allocations
 from health import health
-from master import get_master
-from mailer import mail
 from inactive_shards import inactive_shards
 from indices import indices
-from allocations import allocations
+from mailer import mail
+from master import get_master
 from nodes import nodes
 
 LOG_FILENAME = "es_monitor.log"
@@ -28,7 +28,6 @@ with open("clusters.json") as f:
     for cluster, config in json.load(f).iteritems():
         result = []
         logger.info("")
-        logger.info("")
         logger.info("Processing Cluster [%s]", cluster)
         if not config.get("enabled", True):
             logger.info("Cluster [%s] is disabled", cluster)
@@ -38,7 +37,7 @@ with open("clusters.json") as f:
             master_host = master["host"]
             connection = master["connection"]
             logger.info("Cluster [%s] has a valid master [%s] in the config", cluster, master_host)
-        except:
+        except StandardError as e:
             logger.error("Cluster [%s] does not have a valid master in the config", cluster)
             result.append(
                 {
@@ -51,9 +50,10 @@ with open("clusters.json") as f:
             continue
 
         result.append(health(cluster, connection))
-        result.append(indices(cluster, connection))
-        result.append(inactive_shards(cluster, connection))
-        result.append(allocations(cluster, connection))
+        result.append(indices(connection))
+        result.append(inactive_shards(connection))
+        result.append(allocations(connection))
         result.append(nodes(cluster, connection))
+
         if any(item['severity'] != "INFO" for item in result):
             mail(cluster, result)

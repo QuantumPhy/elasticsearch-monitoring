@@ -2,14 +2,16 @@ from tabularize_json import tabularize, json
 
 
 def sort(item):
-    return (item["s"], item["i"], item["h"])
+    return item["s"], item["i"], item["h"]
 
 
 def table(title, l):
     temp = """
         <table width='100%' border=1 cellpadding=3 cellspacing=0>
         <caption>{0} Indices</caption>
-        <tr><th>Health</th><th>Index</th><th>State</th><th>Primary</th><th>Replica</th><th>Total Size</th><th>Primary Size</th></tr>
+        <tr>
+          <th>Health</th><th>Index</th><th>State</th><th>Primary</th><th>Replica</th><th>Size</th><th>Primary Size</th>
+        </tr>
     """.format(title)
     for item in sorted(l, key=sort):
         temp += "<tr><td>" + "</td><td>".join([
@@ -24,7 +26,7 @@ def table(title, l):
     return temp + "</table><br/>"
 
 
-def indices(cluster, connection):
+def indices(connection):
     r1 = connection("/_cat/indices?bytes=m&h=i,h,s,pri,rep,store.size,pri.store.size")
     response = r1.read()
     result = {
@@ -72,4 +74,5 @@ def indices(cluster, connection):
             result["body"] += table("Yellow", yellow)
         if closed:
             result["body"] += table("Closed", closed)
+
     return result

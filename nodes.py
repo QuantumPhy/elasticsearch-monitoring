@@ -8,20 +8,20 @@ node_ranks = {
 
 
 def sort(item):
-    return (node_ranks.get(item["master"] or "", 3), item["name"] or "", item["host"] or "", item["ip"] or "")
+    return node_ranks.get(item["master"] or "", 3), item["name"] or "", item["host"] or "", item["ip"] or ""
 
 
 def get_master_mark(data):
     return "N" if data == "-" else "Y" if data == "m" else "*"
 
 
-def table(title, l, nodes):
+def table(title, l, all_nodes):
     temp = """
         <table width='100%' border=1 cellpadding=3 cellspacing=0>
         <caption>{0}</caption>
         <tr><th>Node's Name</th><th>Node's Hostname</th><th>Node's IP</th><th>Master?</th></tr>
     """.format(title)
-    for item in sorted((nodes[item] for item in l), key=sort):
+    for item in sorted((all_nodes[item] for item in l), key=sort):
         temp += "<tr><td>" + "</td><td>".join([
             item["name"] or "",
             item["host"] or "",
@@ -47,10 +47,10 @@ def nodes(cluster, connection):
         }
     else:
         new_nodes = dict()
+        old_nodes = dict()
         for node in json.loads(response):
             new_nodes[node["name"]] = node
         try:
-            old_nodes = dict()
             with open("{0}_nodes.txt".format(cluster), "r") as f:
                 for line in f:
                     a = line.strip().split("\t")

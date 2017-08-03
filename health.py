@@ -1,11 +1,6 @@
 import logging
-from tabularize_json import tabularize
+from tabularize_json import tabularize, json
 logger = logging.getLogger("HEALTH")
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
 
 
 def health(cluster, con):

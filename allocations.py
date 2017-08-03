@@ -2,7 +2,7 @@ from tabularize_json import tabularize, json
 
 
 def sort(item):
-    return (-float(item["disk.percent"] or 0), -int(item["disk.avail"] or 0), -int(item["disk.used"] or 0))
+    return -float(item["disk.percent"] or 0), -int(item["disk.avail"] or 0), -int(item["disk.used"] or 0)
 
 
 def table(title, l):
@@ -25,7 +25,7 @@ def table(title, l):
     return temp + "</table><br/>"
 
 
-def allocations(cluster, connection):
+def allocations(connection):
     r1 = connection("/_cat/allocation?bytes=m")
     response = r1.read()
     result = {
@@ -40,10 +40,10 @@ def allocations(cluster, connection):
             "body": tabularize(response)
         }
     else:
-        allocations = json.loads(response)
-        warn = [a for a in allocations if 80 < float(a["disk.percent"] or 0) < 85]
-        errors = [a for a in allocations if float(a["disk.percent"] or 0) >= 85]
-        unassigned = [a for a in allocations if a["node"] == "UNASSIGNED"]
+        allocs = json.loads(response)
+        warn = [a for a in allocs if 80.0 < float(a["disk.percent"] or 0) < 85.0]
+        errors = [a for a in allocs if float(a["disk.percent"] or 0) >= 85]
+        unassigned = [a for a in allocs if a["node"] == "UNASSIGNED"]
 
         if errors:
             result["severity"] = "FATAL"
