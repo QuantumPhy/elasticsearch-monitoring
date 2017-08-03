@@ -1,8 +1,14 @@
 from tabularize_json import tabularize, json
 
+node_ranks = {
+    "*": 0,
+    "m": 1,
+    "-": 2
+}
+
 
 def sort(item):
-    return (item["name"] or "", item["host"] or "", item["ip"] or "")
+    return (node_ranks.get(item["master"] or "", 3), item["name"] or "", item["host"] or "", item["ip"] or "")
 
 
 def get_master_mark(data):
@@ -91,5 +97,7 @@ def nodes(cluster, connection):
                         ) for item in new_nodes.values()
                     )
                 )
+
+        result["body"] += table("Current List of Nodes", new_node_names, new_nodes)
 
     return result
