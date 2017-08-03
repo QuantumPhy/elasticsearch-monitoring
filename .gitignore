@@ -109,3 +109,14 @@ ENV/
 # ignore log files and text files
 *.txt
 *.log
+logs
+
+# ignore idea files
+.idea
+*.iml
+
+# ignore zip files
+*.zip
+
+# ignore config directory
+config
