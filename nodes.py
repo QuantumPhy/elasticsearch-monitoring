@@ -5,6 +5,10 @@ def sort(item):
     return (item["name"] or "", item["host"] or "", item["ip"] or "")
 
 
+def get_master_mark(data):
+    return "N" if data == "-" else "Y" if data == "m" else "*"
+
+
 def table(title, l, nodes):
     temp = """
         <table width='100%' border=1 cellpadding=3 cellspacing=0>
@@ -16,7 +20,7 @@ def table(title, l, nodes):
             item["name"] or "",
             item["host"] or "",
             item["ip"] or "",
-            "Y" if item["master"] == "*" else "N"
+            get_master_mark(item["master"] or "")
         ]) + "</td></tr>"
     return temp + "</table><br/>"
 
@@ -82,7 +86,7 @@ def nodes(cluster, connection):
                                 item["name"],
                                 item["host"],
                                 item["ip"],
-                                "Y" if item["master"] == "*" else "N"
+                                get_master_mark(item["master"] or "")
                             )
                         ) for item in new_nodes.values()
                     )
