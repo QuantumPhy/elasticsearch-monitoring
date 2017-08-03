@@ -36,7 +36,9 @@ def nodes(cluster, connection):
             "body": tabularize(response)
         }
     else:
-        new_nodes = {node["name"]: node for node in json.loads(response)}
+        new_nodes = dict()
+        for node in json.loads(response):
+            new_nodes[node["name"]] = node
         try:
             old_nodes = dict()
             with open("{0}_nodes.txt".format(cluster), "r") as f:
