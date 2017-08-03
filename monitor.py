@@ -30,6 +30,9 @@ with open("clusters.json") as f:
         logger.info("")
         logger.info("")
         logger.info("Processing Cluster [%s]", cluster)
+        if not config.get("enabled", True):
+            logger.info("Cluster [%s] is disabled", cluster)
+            continue
         try:
             master = get_master(cluster, config)
             master_host = master["host"]
