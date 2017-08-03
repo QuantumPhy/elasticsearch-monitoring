@@ -6,6 +6,7 @@ from mailer import mail
 from inactive_shards import inactive_shards
 from indices import indices
 from allocations import allocations
+from nodes import nodes
 
 LOG_FILENAME = "es_monitor.log"
 
@@ -50,6 +51,7 @@ with open("clusters.json") as f:
         result.append(indices(cluster, connection))
         result.append(inactive_shards(cluster, connection))
         result.append(allocations(cluster, connection))
+        result.append(nodes(cluster, connection))
         # from pprint import pprint
         # pprint(result)
         # if any(item['severity'] != "INFO" for item in result):
