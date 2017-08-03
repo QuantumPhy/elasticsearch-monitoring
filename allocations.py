@@ -26,9 +26,7 @@ def table(title, l):
 
 
 def allocations(cluster, connection):
-    connection.request("GET", "/_cat/allocation?bytes=m",
-                       headers={"Content-Type": "application/json"})
-    r1 = connection.getresponse()
+    r1 = connection("/_cat/allocation?bytes=m")
     response = r1.read()
     result = {
         "severity": "INFO",

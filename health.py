@@ -9,8 +9,7 @@ except ImportError:
 
 
 def health(cluster, con):
-    con.request("GET", "/_cat/health", headers={"Content-Type": "application/json"})
-    r1 = con.getresponse()
+    r1 = con("/_cat/health")
     response = r1.read()
     if r1.status != 200:
         return {

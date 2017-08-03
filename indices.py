@@ -25,9 +25,7 @@ def table(title, l):
 
 
 def indices(cluster, connection):
-    connection.request("GET", "/_cat/indices?bytes=m&h=i,h,s,pri,rep,store.size,pri.store.size",
-                       headers={"Content-Type": "application/json"})
-    r1 = connection.getresponse()
+    r1 = connection("/_cat/indices?bytes=m&h=i,h,s,pri,rep,store.size,pri.store.size")
     response = r1.read()
     result = {
         "severity": "INFO",

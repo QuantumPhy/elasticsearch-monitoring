@@ -20,8 +20,16 @@ def get_master(cluster, config):
     return CHOSEN_MASTERS[cluster]
 
 
+def request(connection, headers):
+    def get(path):
+        connection.request("GET", path, headers=headers)
+        return connection.getresponse()
+    return get
+
+
 def Try(hostname, config):
     try:
+        headers = {'Content-Type': 'application/json'}
         if config.get("secure", False):
             import sys
             if sys.version_info >= (2, 7, 9):
@@ -32,13 +40,12 @@ def Try(hostname, config):
             credentials = b64encode(
                 b"{0}:{1}".format(config.get("username", ""), config.get("password", ""))
             ).decode("ascii")
-            headers = {'Authorization': 'Basic %s' % credentials}
+            headers['Authorization'] = 'Basic %s' % credentials
         else:
             conn = httplib.HTTPConnection(hostname)
-            headers = {}
         conn.request("GET", "/", headers=headers)
         conn.getresponse().read()
-        return [(True, hostname, conn)]
+        return [(True, hostname, request(conn, headers))]
     except error as e:
         logger.warn("Host %s throws %s", hostname, e)
         return [(False, None, None)]

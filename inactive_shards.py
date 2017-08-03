@@ -33,9 +33,7 @@ def table(title, l):
 
 
 def inactive_shards(cluster, connection):
-    connection.request("GET", "/_cat/shards?h=index,shard,prirep,state,unassigned.reason,docs,store,ip,node",
-                       headers={"Content-Type": "application/json"})
-    r1 = connection.getresponse()
+    r1 = connection("/_cat/shards?h=index,shard,prirep,state,unassigned.reason,docs,store,ip,node")
     response = r1.read()
     result = {
         "severity": "INFO",

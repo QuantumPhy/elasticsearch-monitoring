@@ -22,9 +22,7 @@ def table(title, l, nodes):
 
 
 def nodes(cluster, connection):
-    connection.request("GET", "/_cat/nodes?bytes=m",
-                       headers={"Content-Type": "application/json"})
-    r1 = connection.getresponse()
+    r1 = connection("/_cat/nodes?bytes=m")
     response = r1.read()
     result = {
         "severity": "INFO",
