@@ -52,8 +52,5 @@ with open("clusters.json") as f:
         result.append(inactive_shards(cluster, connection))
         result.append(allocations(cluster, connection))
         result.append(nodes(cluster, connection))
-        # from pprint import pprint
-        # pprint(result)
-        # if any(item['severity'] != "INFO" for item in result):
-        #     mail(cluster, result)
-        mail(cluster, result)
+        if any(item['severity'] != "INFO" for item in result):
+            mail(cluster, result)
