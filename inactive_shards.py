@@ -87,6 +87,6 @@ def inactive_shards(connection, config):
         if init:
             result["body"] += table("Initializing", init)
         if relocating:
-            result["body"] += table("Relocating", init)
+            result["body"] += table("Relocating", relocating)
 
     return result
