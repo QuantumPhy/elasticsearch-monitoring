@@ -1,5 +1,8 @@
+from indices import is_white_listed
 import logging
+import re
 from tabularize_json import tabularize
+
 logger = logging.getLogger("SHARDS")
 
 try:
@@ -32,7 +35,7 @@ def table(title, l):
     return temp + "</table><br/>"
 
 
-def inactive_shards(connection):
+def inactive_shards(connection, config):
     r1 = connection("/_cat/shards?h=index,shard,prirep,state,unassigned.reason,docs,store,ip,node")
     response = r1.read()
     result = {
@@ -48,16 +51,21 @@ def inactive_shards(connection):
         }
     else:
         shards_data = json.loads(response)
+
+        cfg_whitelisted_indices = config.get("whitelisted_indices", [])
+        whitelisted_indices = set(map(lambda x: re.compile(x), cfg_whitelisted_indices))
+        is_index_whitelisted = is_white_listed(whitelisted_indices)
+
         started = [shard for shard in shards_data if shard["state"] == "STARTED"]
         init = [shard for shard in shards_data if shard["state"] == "INITIALIZING"]
         relocating = [shard for shard in shards_data if shard["state"] == "RELOCATING"]
         unassigned = [shard for shard in shards_data if shard["state"] == "UNASSIGNED"]
 
-        if init or any(s["prirep"] == "p" for s in relocating):
+        if init and not all(is_index_whitelisted(i["index"]) for i in init):
             result["severity"] = "FATAL"
-        elif unassigned and all(u["unassigned.reason"] == "INDEX_CREATED" for u in unassigned):
-            result["severity"] = "WARNING"
-        elif unassigned:
+        elif any(s["prirep"] == "p" and not is_index_whitelisted(s["index"]) for s in relocating):
+            result["severity"] = "FATAL"
+        elif unassigned and not all(is_index_whitelisted(i["index"]) for i in unassigned):
             result["severity"] = "FATAL"
 
         result["body"] += """<table width='100%' border=1 cellpadding=3 cellspacing=0>

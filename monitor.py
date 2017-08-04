@@ -49,11 +49,11 @@ with open("clusters.json") as f:
             mail(cluster, result)
             continue
 
-        result.append(health(cluster, connection))
-        result.append(indices(connection))
-        result.append(inactive_shards(connection))
-        result.append(allocations(connection))
-        result.append(nodes(cluster, connection))
+        result.append(health(connection, config))
+        result.append(indices(connection, config))
+        result.append(inactive_shards(connection, config))
+        result.append(allocations(connection, config))
+        result.append(nodes(cluster, connection, config))
 
         if any(item['severity'] != "INFO" for item in result):
             mail(cluster, result)

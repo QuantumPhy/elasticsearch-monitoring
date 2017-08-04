@@ -31,7 +31,7 @@ def table(title, l, all_nodes):
     return temp + "</table><br/>"
 
 
-def nodes(cluster, connection):
+def nodes(cluster, connection, config):
     r1 = connection("/_cat/nodes?bytes=m")
     response = r1.read()
     result = {
@@ -99,5 +99,8 @@ def nodes(cluster, connection):
                 )
 
         result["body"] += table("Current List of Nodes", new_node_names, new_nodes)
+
+    if not config.get("enable_nodes_check", True):
+        result["severity"] = "INFO"
 
     return result

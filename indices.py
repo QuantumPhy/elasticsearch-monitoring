@@ -1,4 +1,5 @@
 from tabularize_json import tabularize, json
+import re
 
 
 def sort(item):
@@ -26,7 +27,13 @@ def table(title, l):
     return temp + "</table><br/>"
 
 
-def indices(connection):
+def is_white_listed(whitelisted):
+    def temp(index):
+        return any(j.search(index) is not None for j in whitelisted)
+    return temp
+
+
+def indices(connection, config):
     r1 = connection("/_cat/indices?bytes=m&h=i,h,s,pri,rep,store.size,pri.store.size")
     response = r1.read()
     result = {
@@ -42,14 +49,20 @@ def indices(connection):
         }
     else:
         indices_data = json.loads(response)
+        cfg_whitelisted_indices = config.get("whitelisted_indices", [])
+        whitelisted_indices = set(map(lambda x: re.compile(x), cfg_whitelisted_indices))
+        is_index_whitelisted = is_white_listed(whitelisted_indices)
+
         red = [i for i in indices_data if i["h"] == "red"]
         yellow = [i for i in indices_data if i["h"] == "yellow"]
         closed = [i for i in indices_data if i["s"] == "close"]
         opened = [i for i in indices_data if i["s"] == "open"]
 
-        if red:
+        if red and not all(is_index_whitelisted(i["i"]) for i in red):
             result["severity"] = "FATAL"
-        elif yellow:
+        elif yellow and not all(is_index_whitelisted(i["i"]) for i in yellow):
+            result["severity"] = "WARNING"
+        elif closed and not all(is_index_whitelisted(i["i"]) for i in closed):
             result["severity"] = "WARNING"
 
         result["body"] += """<table width='100%' border=1 cellpadding=3 cellspacing=0>

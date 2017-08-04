@@ -25,7 +25,7 @@ def table(title, l):
     return temp + "</table><br/>"
 
 
-def allocations(connection):
+def allocations(connection, config):
     r1 = connection("/_cat/allocation?bytes=m")
     response = r1.read()
     result = {
@@ -56,5 +56,8 @@ def allocations(connection):
             result["body"] += table("Allocations Maxed out", errors)
         if warn:
             result["body"] += table("Allocations Maxing out", warn)
+
+        if not config.get("enable_allocations_check", True):
+            result["severity"] = "INFO"
 
     return result
