@@ -35,17 +35,17 @@ def table(title, l):
     return temp + "</table><br/>"
 
 
-def inactive_shards(connection, config):
+def inactive_shards(connection, config, health):
     r1 = connection("/_cat/shards?h=index,shard,prirep,state,unassigned.reason,docs,store,ip,node")
     response = r1.read()
     result = {
-        "severity": "INFO",
+        "severity": health,
         "title": "Shards",
         "body": ""
     }
     if r1.status != 200:
         result = {
-            "severity": "FATAL",
+            "severity": "FATAL" if health != "INFO" else health,
             "title": "Shards Check Failed with HTTP Code [{0}]".format(r1.status),
             "body": tabularize(response)
         }
@@ -62,11 +62,11 @@ def inactive_shards(connection, config):
         unassigned = [shard for shard in shards_data if shard["state"] == "UNASSIGNED"]
 
         if init and not all(is_index_whitelisted(i["index"]) for i in init):
-            result["severity"] = "FATAL"
+            result["severity"] = "WARNING" if health != "FATAL" else "FATAL"
         elif any(s["prirep"] == "p" and not is_index_whitelisted(s["index"]) for s in relocating):
-            result["severity"] = "FATAL"
+            result["severity"] = "WARNING" if health != "FATAL" else "FATAL"
         elif unassigned and not all(is_index_whitelisted(i["index"]) for i in unassigned):
-            result["severity"] = "FATAL"
+            result["severity"] = "WARNING" if health != "FATAL" else "FATAL"
 
         result["body"] += """<table width='100%' border=1 cellpadding=3 cellspacing=0>
             <tr><td>Total</td><td>{0}</td></tr>

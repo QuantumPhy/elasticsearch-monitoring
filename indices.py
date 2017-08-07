@@ -33,17 +33,17 @@ def is_white_listed(whitelisted):
     return temp
 
 
-def indices(connection, config):
+def indices(connection, config, health):
     r1 = connection("/_cat/indices?bytes=m&h=i,h,s,pri,rep,store.size,pri.store.size")
     response = r1.read()
     result = {
-        "severity": "INFO",
+        "severity": health,
         "title": "Indices",
         "body": ""
     }
     if r1.status != 200:
         result = {
-            "severity": "FATAL",
+            "severity": "FATAL" if health != "INFO" else health,
             "title": "Indices Check Failed with HTTP Code [{0}]".format(r1.status),
             "body": tabularize(response)
         }
@@ -59,7 +59,7 @@ def indices(connection, config):
         opened = [i for i in indices_data if i["s"] == "open"]
 
         if red and not all(is_index_whitelisted(i["i"]) for i in red):
-            result["severity"] = "FATAL"
+            result["severity"] = "WARNING" if health != "FATAL" else "FATAL"
         elif yellow and not all(is_index_whitelisted(i["i"]) for i in yellow):
             result["severity"] = "WARNING"
         elif closed and not all(is_index_whitelisted(i["i"]) for i in closed):

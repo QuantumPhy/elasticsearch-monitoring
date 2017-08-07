@@ -16,7 +16,7 @@ def get_master(cluster, config):
         if master and conn:
             CHOSEN_MASTERS[cluster] = {"host": master, "connection": conn}
         else:
-            raise StandardError("No valid master found for cluster {0}".format(cluster))
+            raise Exception("No valid master found for cluster {0}".format(cluster))
     return CHOSEN_MASTERS[cluster]
 
 

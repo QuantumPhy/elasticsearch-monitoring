@@ -9,7 +9,7 @@ def health(con, config):
     if r1.status != 200:
         return {
             "severity": "FATAL",
-            "title": "Health Check Failed",
+            "title": "Health Check Failed with HTTP Code [{0}]".format(r1.status),
             "body": tabularize(response)
         }
     else:

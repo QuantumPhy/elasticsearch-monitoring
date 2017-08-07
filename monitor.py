@@ -37,7 +37,7 @@ with open("clusters.json") as f:
             master_host = master["host"]
             connection = master["connection"]
             logger.info("Cluster [%s] has a valid master [%s] in the config", cluster, master_host)
-        except StandardError as e:
+        except Exception as e:
             logger.error("Cluster [%s] does not have a valid master in the config", cluster)
             result.append(
                 {
@@ -49,9 +49,14 @@ with open("clusters.json") as f:
             mail(cluster, result)
             continue
 
-        result.append(health(connection, config))
-        result.append(indices(connection, config))
-        result.append(inactive_shards(connection, config))
+        cluster_health = health(connection, config)
+        result.append(cluster_health)
+
+        # These metrics are not alarming if the cluster health is good
+        result.append(indices(connection, config, cluster_health["severity"]))
+        result.append(inactive_shards(connection, config, cluster_health["severity"]))
+
+        # These metrics are alarming irrespective of the cluster health
         result.append(allocations(connection, config))
         result.append(nodes(cluster, connection, config))
 
