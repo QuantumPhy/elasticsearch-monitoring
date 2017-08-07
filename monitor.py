@@ -15,15 +15,16 @@ except IOError:
     pass
 
 LOG_FILENAME = "logs/es_monitor.log"
+LOG_MSG_FORMAT = "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
+LOG_DATE_FORMAT = "%d-%m-%Y %H:%M:%S"
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
-    datefmt="%d-%m-%Y %H:%M:%S"
-)
-logger = logging.getLogger("ES_MONITOR")
-logger.setLevel(logging.INFO)
-logger.addHandler(logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=1e7, backupCount=20))
+# Setup default stream logger
+logging.basicConfig(level=logging.INFO, format=LOG_MSG_FORMAT, datefmt=LOG_DATE_FORMAT)
+
+# Setup rotating log file handler
+rotating_file_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=1e7, backupCount=20)
+rotating_file_handler.setFormatter(logging.Formatter(fmt=LOG_MSG_FORMAT, datefmt=LOG_DATE_FORMAT))
+logging.root.addHandler(rotating_file_handler)
 
 try:
     import simplejson as json
@@ -31,20 +32,24 @@ except ImportError:
     import json
 
 with open("clusters.json") as f:
+    logging.info("")
+    logging.info("The Watch Dog wakes up")
     for cluster, config in json.load(f).iteritems():
         result = []
-        logger.info("")
-        logger.info("Processing Cluster [%s]", cluster)
+        logging.info("")
+        logging.info("Begin processing Cluster [%s]", cluster)
         if not config.get("enabled", True):
-            logger.info("Cluster [%s] is disabled", cluster)
+            logging.info("Cluster [%s] is disabled", cluster)
+            logging.info("End processing Cluster [%s]", cluster)
             continue
         try:
             master = get_master(cluster, config)
             master_host = master["host"]
             connection = master["connection"]
-            logger.info("Cluster [%s] has a valid master [%s] in the config", cluster, master_host)
+            logging.info("Cluster [%s] has a valid master [%s] in the config", cluster, master_host)
         except Exception as e:
-            logger.error("Cluster [%s] does not have a valid master in the config", cluster)
+            logging.error("Cluster [%s] does not have a valid master in the config", cluster)
+            logging.info("End processing Cluster [%s]", cluster)
             result.append(
                 {
                     "title": "No valid elasticsearch instance in the configuration",
@@ -68,3 +73,8 @@ with open("clusters.json") as f:
 
         if any(item['severity'] != "INFO" for item in result):
             mail(cluster, result)
+
+        logging.info("End processing Cluster [%s]", cluster)
+
+    logging.info("The Watch Dog rests")
+    logging.info("")

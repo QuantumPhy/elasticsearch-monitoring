@@ -2,7 +2,6 @@ import httplib
 import ssl
 import logging
 from socket import error
-logger = logging.getLogger("NODE_FINDER")
 
 CHOSEN_MASTERS = {}
 
@@ -47,8 +46,8 @@ def get_conn(hostname, config):
         conn.getresponse().read()
         return [(True, hostname, request(conn, headers))]
     except error as e:
-        logger.warn("Host %s throws %s", hostname, e)
+        logging.warn("Host %s throws %s", hostname, e)
         return [(False, None, None)]
     except Exception as e:
-        logger.warn("Unexpected Exception %s with %s", e, hostname)
+        logging.warn("Unexpected Exception %s with %s", e, hostname)
         return [(False, None, None)]

@@ -1,6 +1,5 @@
 import logging
 from tabularize_json import tabularize, json
-logger = logging.getLogger("HEALTH")
 
 
 def health(con, config):

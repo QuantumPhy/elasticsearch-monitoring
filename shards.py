@@ -3,8 +3,6 @@ import logging
 import re
 from tabularize_json import tabularize
 
-logger = logging.getLogger("SHARDS")
-
 try:
     import simplejson as json
 except ImportError:
