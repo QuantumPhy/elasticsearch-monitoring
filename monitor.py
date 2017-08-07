@@ -17,7 +17,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ES_MONITOR")
 logger.setLevel(logging.INFO)
-logger.addHandler(logging.handlers.RotatingFileHandler(LOG_FILENAME, 1e3, 20))
+logger.addHandler(logging.handlers.RotatingFileHandler(LOG_FILENAME, 1e7, 20))
 
 try:
     import simplejson as json
