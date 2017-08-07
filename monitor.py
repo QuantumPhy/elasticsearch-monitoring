@@ -71,8 +71,7 @@ with open("clusters.json") as f:
         result.append(allocations(connection, config))
         result.append(nodes(cluster, connection, config))
 
-        if any(item['severity'] != "INFO" for item in result):
-            mail(cluster, result)
+        mail(cluster, result)
 
         logging.info("End processing Cluster [%s]", cluster)
 
