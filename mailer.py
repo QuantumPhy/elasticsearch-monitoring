@@ -40,9 +40,17 @@ def mail(cluster, content):
     html = "<center><h1>{0} cluster monitoring alert</h1></center>".format(cluster) + \
         "<br />".join(map(format_item, content))
     msg = MIMEText(html, "html")
-    msg["Subject"] = "{0} cluster alert".format(cluster)
+
+    if any(c["severity"] == "FATAL" for c in content):
+        msg["Subject"] = "FATAL: {0} cluster alert".format(cluster)
+    elif any(c["severity"] == "WARNING" for c in content):
+        msg["Subject"] = "WARNING: {0} cluster alert".format(cluster)
+    else:
+        msg["Subject"] = "INFO: {0} cluster alert".format(cluster)
+
     msg["From"] = mailer["sender"]
     msg["To"] = ",".join(mailer["receivers"])
+
     s = smtplib.SMTP(mailer["smtp_server"])
     s.sendmail(mailer["sender"], mailer["receivers"], msg.as_string())
     s.quit()

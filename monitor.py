@@ -76,5 +76,5 @@ with open("clusters.json") as f:
 
         logging.info("End processing Cluster [%s]", cluster)
 
-    logging.info("The Watch Dog rests")
     logging.info("")
+    logging.info("The Watch Dog rests")
