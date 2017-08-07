@@ -37,7 +37,7 @@ def shards(connection, config, health):
     r1 = connection("/_cat/shards?h=index,shard,prirep,state,unassigned.reason,docs,store,ip,node")
     response = r1.read()
     result = {
-        "severity": health,
+        "severity": "INFO",
         "title": "Shards",
         "body": ""
     }

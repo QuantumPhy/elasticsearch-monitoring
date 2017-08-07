@@ -37,7 +37,7 @@ def indices(connection, config, health):
     r1 = connection("/_cat/indices?bytes=m&h=i,h,s,pri,rep,store.size,pri.store.size")
     response = r1.read()
     result = {
-        "severity": health,
+        "severity": "INFO",
         "title": "Indices",
         "body": ""
     }
