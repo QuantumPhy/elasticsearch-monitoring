@@ -1,5 +1,6 @@
 import smtplib
 import re
+import logging
 from email.mime.text import MIMEText
 
 try:
@@ -54,21 +55,32 @@ def build_toc(content):
 
 
 def mail(cluster, content):
-    html = "<center><h1>{0} cluster monitoring alert</h1></center>".format(cluster) + \
-           build_toc(content) + \
-           "<br />".join(map(format_item, content))
-    msg = MIMEText(html, "html")
+    receivers = mailer["receivers"]
 
     if any(c["severity"] == "FATAL" for c in content):
-        msg["Subject"] = "FATAL: {0} cluster alert".format(cluster)
+        subject = "FATAL"
+        actual_receivers = receivers.get("FATAL", []) + receivers.get("WARNING", []) + receivers.get("INFO", [])
+        logging.info("Alerting FATAL error")
     elif any(c["severity"] == "WARNING" for c in content):
-        msg["Subject"] = "WARNING: {0} cluster alert".format(cluster)
+        subject = "WARNING"
+        actual_receivers = receivers.get("WARNING", []) + receivers.get("INFO", [])
+        logging.info("Alerting Warning")
     else:
-        msg["Subject"] = "INFO: {0} cluster alert".format(cluster)
+        subject = "INFO"
+        actual_receivers = receivers.get("INFO", [])
+        logging.info("Alerting information")
 
-    msg["From"] = mailer["sender"]
-    msg["To"] = ",".join(mailer["receivers"])
+    if actual_receivers:
+        html = "<center><h1>{0} cluster monitoring alert</h1></center>".format(cluster) + \
+               build_toc(content) + \
+               "<br />".join(map(format_item, content))
+        msg = MIMEText(html, "html")
+        msg["Subject"] = "{0}: {1} cluster alert".format(subject, cluster)
+        msg["From"] = mailer["sender"]
+        msg["To"] = ",".join(actual_receivers)
 
-    s = smtplib.SMTP(mailer["smtp_server"])
-    s.sendmail(mailer["sender"], mailer["receivers"], msg.as_string())
-    s.quit()
+        s = smtplib.SMTP(mailer["smtp_server"])
+        s.sendmail(mailer["sender"], actual_receivers, msg.as_string())
+        s.quit()
+    else:
+        logging.warn("No valid recipient list found to alert.")
