@@ -33,7 +33,7 @@ def format_item(item):
           <td style='width: 5%'><a href="#toc">Top</a></td>
         </tr>
         <tr>
-          <td style='border:0'><pre>{2}</pre></td>
+          <td style='border:0' colspan='2' align='center'><pre>{2}</pre></td>
         </tr>
       </table>
     </p>
