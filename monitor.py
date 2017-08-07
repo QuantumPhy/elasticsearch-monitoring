@@ -11,7 +11,7 @@ from os import mkdir
 
 try:
     mkdir("logs")
-except IOError:
+except OSError:
     pass
 
 LOG_FILENAME = "logs/es_monitor.log"
