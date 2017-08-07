@@ -7,8 +7,14 @@ from indices import indices
 from mailer import mail
 from master import get_master
 from nodes import nodes
+from os import mkdir
 
-LOG_FILENAME = "es_monitor.log"
+try:
+    mkdir("logs")
+except IOError:
+    pass
+
+LOG_FILENAME = "logs/es_monitor.log"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -17,7 +23,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ES_MONITOR")
 logger.setLevel(logging.INFO)
-logger.addHandler(logging.handlers.RotatingFileHandler(LOG_FILENAME, 1e7, 20))
+logger.addHandler(logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=1e7, backupCount=20))
 
 try:
     import simplejson as json
