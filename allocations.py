@@ -60,4 +60,6 @@ def allocations(connection, config):
         if not config.get("enable_allocations_check", True):
             result["severity"] = "INFO"
 
+        result["body"] += table("Current Allocations", allocs)
+
     return result
