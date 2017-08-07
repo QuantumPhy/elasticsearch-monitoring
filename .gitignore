@@ -115,8 +115,9 @@ logs
 .idea
 *.iml
 
-# ignore zip files
+# ignore zip and tar files
 *.zip
+*.tar
 
 # ignore config directory
 config
