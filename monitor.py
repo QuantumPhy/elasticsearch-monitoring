@@ -2,7 +2,7 @@ import logging.handlers
 
 from allocations import allocations
 from health import health
-from inactive_shards import inactive_shards
+from shards import shards
 from indices import indices
 from mailer import mail
 from master import get_master
@@ -54,7 +54,7 @@ with open("clusters.json") as f:
 
         # These metrics are not alarming if the cluster health is good
         result.append(indices(connection, config, cluster_health["severity"]))
-        result.append(inactive_shards(connection, config, cluster_health["severity"]))
+        result.append(shards(connection, config, cluster_health["severity"]))
 
         # These metrics are alarming irrespective of the cluster health
         result.append(allocations(connection, config))

@@ -35,7 +35,7 @@ def table(title, l):
     return temp + "</table><br/>"
 
 
-def inactive_shards(connection, config, health):
+def shards(connection, config, health):
     r1 = connection("/_cat/shards?h=index,shard,prirep,state,unassigned.reason,docs,store,ip,node")
     response = r1.read()
     result = {
