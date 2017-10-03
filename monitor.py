@@ -8,6 +8,7 @@ from mailer import mail
 from master import get_master
 from nodes import nodes
 from os import mkdir
+from url_checker import url_checker
 
 try:
     mkdir("logs")
@@ -19,11 +20,17 @@ LOG_MSG_FORMAT = "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
 LOG_DATE_FORMAT = "%d-%m-%Y %H:%M:%S"
 
 # Setup default stream logger
-logging.basicConfig(level=logging.INFO, format=LOG_MSG_FORMAT, datefmt=LOG_DATE_FORMAT)
+logging.basicConfig(
+    level=logging.INFO, format=LOG_MSG_FORMAT, datefmt=LOG_DATE_FORMAT
+)
 
 # Setup rotating log file handler
-rotating_file_handler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=1e7, backupCount=20)
-rotating_file_handler.setFormatter(logging.Formatter(fmt=LOG_MSG_FORMAT, datefmt=LOG_DATE_FORMAT))
+rotating_file_handler = logging.handlers.RotatingFileHandler(
+    LOG_FILENAME, maxBytes=1e7, backupCount=20
+)
+rotating_file_handler.setFormatter(
+    logging.Formatter(fmt=LOG_MSG_FORMAT, datefmt=LOG_DATE_FORMAT)
+)
 logging.root.addHandler(rotating_file_handler)
 
 try:
@@ -46,9 +53,13 @@ with open("clusters.json") as f:
             master = get_master(cluster, config)
             master_host = master["host"]
             connection = master["connection"]
-            logging.info("Cluster [%s] has a valid master [%s] in the config", cluster, master_host)
+            logging.info(
+                "Cluster [%s] has a valid master [%s] in the config", cluster, master_host
+            )
         except Exception as e:
-            logging.error("Cluster [%s] does not have a valid master in the config", cluster)
+            logging.error(
+                "Cluster [%s] does not have a valid master in the config", cluster
+            )
             logging.info("End processing Cluster [%s]", cluster)
             result.append(
                 {
@@ -74,6 +85,8 @@ with open("clusters.json") as f:
         mail(cluster, result)
 
         logging.info("End processing Cluster [%s]", cluster)
+
+    mail("URLs Checker", [url_checker()])
 
     logging.info("")
     logging.info("The Watch Dog rests")
