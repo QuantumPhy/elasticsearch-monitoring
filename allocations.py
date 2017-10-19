@@ -2,7 +2,7 @@ from tabularize_json import tabularize, json
 
 
 def sort(item):
-    return -float(item["disk.percent"] or 0), -int(item["disk.avail"] or 0), -int(item["disk.used"] or 0)
+    return -float(item["disk.percent"] or 0)
 
 
 def table(title, l):
@@ -26,7 +26,7 @@ def table(title, l):
 
 
 def allocations(connection, config):
-    r1 = connection("/_cat/allocation?bytes=m")
+    r1 = connection("/_cat/allocation")
     response = r1.read()
     result = {
         "severity": "INFO",
